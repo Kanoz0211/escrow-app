@@ -6,28 +6,36 @@ export async function POST(req: Request) {
   try {
     const event = await req.json();
 
-    console.log('🔔 Webhook Received:', event.key); // ดู Log ว่ามีใครเรียกมาไหม
-
-    // ตรวจสอบว่า Event คือ "จ่ายเงินสำเร็จ" (charge.complete) และสถานะต้อง successful
+    // ตรวจสอบว่าเป็น Event จ่ายเงินสำเร็จ
     if (event.key === 'charge.complete' && event.data.status === 'successful') {
       
-      const orderId = event.data.metadata.order_id; // ดึง Order ID ที่เราเคยแนบไว้
+      const orderId = event.data.metadata.order_id;
       const chargeId = event.data.id;
 
       console.log(`💰 Payment Successful for Order: ${orderId}`);
 
-      // อัปเดต Database เป็น PAID
-      const { error } = await supabase
+      // 1. อัปเดตสถานะ Order เป็น PAID
+      const { data: order, error: orderError } = await supabase
         .from('orders')
         .update({ 
           status: 'PAID',
-          payment_ref_id: chargeId // เก็บเลข Ref ไว้ตรวจสอบย้อนหลัง
+          payment_ref_id: chargeId 
         })
-        .eq('id', orderId);
+        .eq('id', orderId)
+        .select() // ขอข้อมูลที่อัปเดตกลับมาด้วย (จะได้รู้ product_id)
+        .single();
 
-      if (error) throw error;
+      if (orderError) throw orderError;
+
+      // 2. 👇 (เพิ่มใหม่) ไปอัปเดตสินค้าว่า "ขายแล้ว" (sold = true)
+      if (order) {
+        await supabase
+          .from('products')
+          .update({ sold: true })
+          .eq('id', order.product_id);
+      }
       
-      return NextResponse.json({ message: 'Order updated successfully' });
+      return NextResponse.json({ message: 'Order & Product updated successfully' });
     }
 
     return NextResponse.json({ message: 'Event ignored' });

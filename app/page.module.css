@@ -2,52 +2,83 @@
 .container {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 40px 20px;
+  padding: 60px 20px;
 }
 
 .title {
-  font-size: 2rem;
+  font-size: 2.5rem;
+  font-weight: 800;
   text-align: center;
-  margin-bottom: 40px;
-  color: #2c3e50;
+  margin-bottom: 50px;
+  background: linear-gradient(to right, #2d3436, #d4af37);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; /* ตัวหนังสือไล่สี */
+  letter-spacing: -1px;
 }
 
 .grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive Grid แบบไม่ต้องคิดเยอะ */
-  gap: 20px;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 30px;
 }
 
 .card {
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  background: var(--bg-card);
+  border-radius: 16px;
   padding: 20px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-  transition: transform 0.2s ease;
+  border: 1px solid rgba(0,0,0,0.03);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: var(--shadow-soft);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
 }
 
+/* เอฟเฟกต์ตอนเอาเมาส์ชี้การ์ด */
 .card:hover {
-  transform: translateY(-5px); /* ขยับขึ้นนิดนึงตอนเอาเมาส์ชี้ */
-  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
-}
-
-.productTitle {
-  font-size: 1.25rem;
-  margin-bottom: 10px;
-  font-weight: bold;
-}
-
-.price {
-  color: #27ae60; /* สีเขียวเงิน */
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-top: 15px;
+  transform: translateY(-10px);
+  box-shadow: var(--shadow-hover);
+  border-color: rgba(212, 175, 55, 0.3);
 }
 
 .emptyState {
   text-align: center;
-  color: #888;
-  font-style: italic;
-  grid-column: 1 / -1; /* ให้กินพื้นที่เต็มความกว้าง */
+  font-size: 1.2rem;
+  color: var(--text-muted);
+  margin-top: 50px;
+}
+
+.productTitle {
+  font-size: 1.2rem;
+  font-weight: 700;
+  margin: 15px 0 8px 0;
+  color: var(--text-main);
+}
+
+.price {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #c5a028; /* สีทอง */
+  margin: 10px 0;
+}
+
+/* ตกแต่งส่วนรูปภาพเพิ่มเติม */
+.imageContainer {
+  height: 220px;
+  background-color: #f1f1f1;
+  border-radius: 12px;
+  overflow: hidden;
+  position: relative;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .imageContainer img {
+  transform: scale(1.05); /* รูปขยายออกนิดนึงตอนชี้ */
 }

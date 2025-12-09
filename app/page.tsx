@@ -19,7 +19,8 @@ export default async function Home() {
   const { data: products, error } = await supabase
     .from('products')
     .select('*')
-    .order('created_at', { ascending: false }); // เพิ่มการเรียงลำดับ
+    .eq('sold', false) // 👈 เพิ่มบรรทัดนี้ครับ (แปลว่า: เอาเฉพาะ sold = false)
+    .order('created_at', { ascending: false });
 
   if (error) {
     return (
@@ -34,9 +35,7 @@ export default async function Home() {
     <main className={styles.container}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px' }}>
         <h1 className={styles.title}>🛒 ตลาดตัวกลาง (Escrow Marketplace)</h1>
-        <a href="/sell" style={{ padding: '10px 20px', backgroundColor: '#28a745', color: 'white', textDecoration: 'none', borderRadius: '5px', fontWeight: 'bold' }}>
-          + ลงขายสินค้า
-        </a>
+        
       </div>
 
       <div className={styles.grid}>
