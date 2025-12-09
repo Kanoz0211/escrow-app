@@ -1,0 +1,53 @@
+/* app/page.module.css */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.title {
+  font-size: 2rem;
+  text-align: center;
+  margin-bottom: 40px;
+  color: #2c3e50;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); /* Responsive Grid แบบไม่ต้องคิดเยอะ */
+  gap: 20px;
+}
+
+.card {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+  transition: transform 0.2s ease;
+}
+
+.card:hover {
+  transform: translateY(-5px); /* ขยับขึ้นนิดนึงตอนเอาเมาส์ชี้ */
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.productTitle {
+  font-size: 1.25rem;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.price {
+  color: #27ae60; /* สีเขียวเงิน */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-top: 15px;
+}
+
+.emptyState {
+  text-align: center;
+  color: #888;
+  font-style: italic;
+  grid-column: 1 / -1; /* ให้กินพื้นที่เต็มความกว้าง */
+}
