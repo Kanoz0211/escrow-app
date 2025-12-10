@@ -2,21 +2,23 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-// 👇 สร้าง Client พิเศษที่ใช้ Service Role Key (ทะลุ RLS ได้)
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// ❌ ลบบรรทัดที่อยู่นอกฟังก์ชันทิ้งไปครับ (ที่เคยอยู่ตรงนี้)
 
 export async function POST(req: Request) {
   try {
+    // ✅ ย้ายมาสร้างข้างในนี้แทนครับ (จะทำงานเมื่อมีคนเรียกใช้เท่านั้น)
+    const supabaseAdmin = createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
+
     const event = await req.json();
 
     if (event.key === 'charge.complete' && event.data.status === 'successful') {
       const orderId = event.data.metadata.order_id;
       const chargeId = event.data.id;
 
-      // 1. อัปเดต Order (ใช้ Admin Client)
+      // 1. อัปเดต Order
       const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
         .update({ status: 'PAID', payment_ref_id: chargeId })
@@ -26,7 +28,7 @@ export async function POST(req: Request) {
 
       if (orderError) throw orderError;
 
-      // 2. ตัดสต็อกสินค้า (ใช้ Admin Client แก้ sold=true)
+      // 2. ตัดสต็อกสินค้า
       if (order) {
         await supabaseAdmin
           .from('products')
