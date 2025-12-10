@@ -1,44 +1,43 @@
 // app/api/webhook/route.ts
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { createClient } from '@supabase/supabase-js';
+
+// 👇 สร้าง Client พิเศษที่ใช้ Service Role Key (ทะลุ RLS ได้)
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.SUPABASE_SERVICE_ROLE_KEY!
+);
 
 export async function POST(req: Request) {
   try {
     const event = await req.json();
 
-    // ตรวจสอบว่าเป็น Event จ่ายเงินสำเร็จ
     if (event.key === 'charge.complete' && event.data.status === 'successful') {
-      
       const orderId = event.data.metadata.order_id;
       const chargeId = event.data.id;
 
-      console.log(`💰 Payment Successful for Order: ${orderId}`);
-
-      // 1. อัปเดตสถานะ Order เป็น PAID
-      const { data: order, error: orderError } = await supabase
+      // 1. อัปเดต Order (ใช้ Admin Client)
+      const { data: order, error: orderError } = await supabaseAdmin
         .from('orders')
-        .update({ 
-          status: 'PAID',
-          payment_ref_id: chargeId 
-        })
+        .update({ status: 'PAID', payment_ref_id: chargeId })
         .eq('id', orderId)
-        .select() // ขอข้อมูลที่อัปเดตกลับมาด้วย (จะได้รู้ product_id)
+        .select()
         .single();
 
       if (orderError) throw orderError;
 
-      // 2. 👇 (เพิ่มใหม่) ไปอัปเดตสินค้าว่า "ขายแล้ว" (sold = true)
+      // 2. ตัดสต็อกสินค้า (ใช้ Admin Client แก้ sold=true)
       if (order) {
-        await supabase
+        await supabaseAdmin
           .from('products')
           .update({ sold: true })
           .eq('id', order.product_id);
       }
       
-      return NextResponse.json({ message: 'Order & Product updated successfully' });
+      return NextResponse.json({ message: 'Success' });
     }
 
-    return NextResponse.json({ message: 'Event ignored' });
+    return NextResponse.json({ message: 'Ignored' });
 
   } catch (error: any) {
     console.error('Webhook Error:', error.message);

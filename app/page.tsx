@@ -1,7 +1,9 @@
 // app/page.tsx
+export const revalidate = 0;
 import { supabase } from '../lib/supabaseClient';
 import BuyButton from '../components/BuyButton'; // อย่าลืม import ปุ่มซื้อ
 import styles from './page.module.css';
+
 
 // กำหนดหน้าตาข้อมูลสินค้า
 interface Product {
